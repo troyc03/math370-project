@@ -1,0 +1,80 @@
+──────────────────────────────────────────────────────────────
+                 SOCIAL SECURITY DIFFERENCE-EQUATION MODEL
+──────────────────────────────────────────────────────────────
+
+                      ┌────────────────────────────┐
+                      │          START             │
+                      └────────────┬───────────────┘
+                                   │
+                                   ▼
+        ┌──────────────────────────────────────────────────────┐
+        │ USER INPUTS                                          │
+        │  • You: birth, work, income, claim/death ages        │
+        │  • Spouse (optional)                                 │
+        │  • Children (optional)                               │
+        │  • Simulation settings (end age, earnings test, etc.)│
+        └────────────┬─────────────────────────────────────────┘
+                     │
+                     ▼
+        ┌──────────────────────────────────────────────────────┐
+        │ PARAMETERS & TABLES                                  │
+        │  • FRA, early reduction, delayed credit              │
+        │  • COLA, AWI, bend points, family max                │
+        │  • Helper functions (ageMAt, safeDiv, etc.)          │
+        └────────────┬─────────────────────────────────────────┘
+                     │
+                     ▼
+        ┌──────────────────────────────────────────────────────┐
+        │ COMPUTE AIME & PIA@62                                │
+        │  • Adjust earnings for AWI                           │
+        │  • Take top 35 years → AIME                          │
+        │  • Apply bend-point formula → PIA@62                 │
+        │  • Repeat for spouse (if applicable)                 │
+        └────────────┬─────────────────────────────────────────┘
+                     │
+                     ▼
+        ┌──────────────────────────────────────────────────────┐
+        │ TIME GRID SETUP                                      │
+        │  • Determine start year (min 62/today)               │
+        │  • Determine end year (simEndAge)                    │
+        │  • Build month index, ages, claim/death markers      │
+        └────────────┬─────────────────────────────────────────┘
+                     │
+                     ▼
+        ┌──────────────────────────────────────────────────────┐
+        │ INITIALIZE VARIABLES                                 │
+        │  • PIA_me, PIA_sp (COLA adjusted)                    │
+        │  • Claim indicators I_t                              │
+        │  • Multipliers (phi, omega, xi)                      │
+        │  • Benefit arrays: B_me, B_sp, B_kids, S_HH          │
+        └────────────┬─────────────────────────────────────────┘
+                     │
+                     ▼
+        ┌──────────────────────────────────────────────────────┐
+        │               MAIN DIFFERENCE LOOP                   │
+        │           for t = 1 : T (each month)                 │
+        │──────────────────────────────────────────────────────│
+        │ (1) Update PIA_t with COLA                           │
+        │ (2) Determine Claiming Status (I_t)                  │
+        │ (3) Apply Early/Delayed Credit → φ_t                 │
+        │ (4) Apply Earnings Test (optional) → ω_t             │
+        │ (5) Compute Spousal Excess → ξ_t                     │
+        │ (6) Compute Own Benefit: B_me, B_sp                  │
+        │ (7) Compute Child Benefits (if any)                  │
+        │ (8) Update Household Benefit:                        │
+        │     B_HH = B_me + B_sp + B_kids                      │
+        │     S_HH = S_(t-1) + B_HH                            │
+        └────────────┬─────────────────────────────────────────┘
+                     │
+                     ▼
+        ┌──────────────────────────────────────────────────────┐
+        │ OUTPUTS & VISUALIZATION                              │
+        │  • Print lifetime nominal totals                     │
+        │  • Plot monthly benefit flows                        │
+        │  • Plot cumulative household benefits                │
+        └────────────┬─────────────────────────────────────────┘
+                     │
+                     ▼
+                      ┌────────────────────────────┐
+                      │            END              │
+                      └────────────────────────────┘

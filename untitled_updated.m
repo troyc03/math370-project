@@ -65,7 +65,7 @@ if hasSpouse
     sp.AIME = computeAIME(sp.birthY, sp.birthM, earn_sp, AWI);
     sp.PIA62 = computePIAfromAIME(sp.AIME, bp_sp(1), bp_sp(2));
 else
-    sp = struct([]);
+    %sp = struct([]);
 end
 
 %% =================== TIME GRID ===================
